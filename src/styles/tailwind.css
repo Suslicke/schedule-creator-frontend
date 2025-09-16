@@ -1,0 +1,23 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* App-wide small utilities */
+.card { @apply bg-white/90 backdrop-blur rounded-xl shadow-sm ring-1 ring-gray-200; }
+.btn { @apply inline-flex items-center justify-center rounded-md px-3.5 py-2 text-base font-medium shadow-sm transition-transform active:scale-[.98]; }
+.btn-primary { @apply btn bg-brand text-white hover:bg-brand-dark; }
+.btn-secondary { @apply btn bg-gray-100 text-gray-900 hover:bg-gray-200; }
+.btn-danger { @apply btn bg-red-600 text-white hover:bg-red-700; }
+
+@layer base {
+  html { @apply text-[17px] md:text-[18px]; }
+  body { @apply text-gray-900; }
+}
+
+.bg-soft-gradient {
+  background: radial-gradient(1200px 600px at 10% 0%, rgba(99,102,241,.10), transparent 60%),
+              radial-gradient(900px 500px at 90% 10%, rgba(59,130,246,.10), transparent 60%),
+              linear-gradient(to bottom, #fafafa, #ffffff);
+}
+
+.input { @apply w-full border rounded-md px-3.5 py-2 text-base bg-white/90 backdrop-blur focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand; }
