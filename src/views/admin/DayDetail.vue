@@ -2,31 +2,34 @@
   <div class="max-w-7xl mx-auto p-4 space-y-4">
     <div class="card p-4 flex flex-wrap gap-3 items-end">
       <div class="text-sm">Day ID: <b>{{ dayId }}</b></div>
-      <div class="flex items-center gap-2"><button class="btn-secondary" @click="replaceVacant" :disabled="busy">Автозамена вакансий</button></div>
+      <div class="flex items-center gap-2"><button class="btn-secondary" @click="replaceVacant" :disabled="busy">{{ t('editor.autoVacant') }}</button></div>
       <div class="flex items-center gap-2">
-        <button class="btn-primary" @click="loadReport" :disabled="busy">Обновить отчёт</button>
-        <button class="btn-primary" @click="approve" :disabled="busy">Approve</button>
+        <button class="btn-primary" @click="loadReport" :disabled="busy">{{ t('dayDetail.refreshReport') }}</button>
+        <button class="btn-primary" @click="approve" :disabled="busy">{{ t('editor.approve') }}</button>
       </div>
       <div class="flex items-center gap-2">
-        <label class="text-xs text-gray-600">Дата для загрузки записей</label>
+        <label class="text-xs text-gray-600">{{ t('dayDetail.lookupDate') }}</label>
         <DatePicker v-model="lookupDate" />
-        <button class="btn-secondary" @click="loadEntries" :disabled="!lookupDate || busy">Загрузить</button>
+        <button class="btn-secondary" @click="loadEntries" :disabled="!lookupDate || busy">{{ t('dayDetail.load') }}</button>
       </div>
+      <label class="ml-auto inline-flex items-center gap-2 text-sm">
+        <input type="checkbox" v-model="onlyApproved" /> {{ t('analytics.onlyApproved') }}
+      </label>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
       <div class="lg:col-span-2 space-y-3">
-        <div class="card p-4" v-if="loadingEntries">Загрузка записей…</div>
-        <ScheduleGrid v-else :entries="entries" />
+        <div class="card p-4" v-if="loadingEntries"><Spinner :inline="true" :label="t('dayDetail.loadingEntries') as string" /></div>
+        <ScheduleGrid v-else :entries="entriesView" />
 
         <div class="card p-4 space-y-2">
-          <h3 class="text-sm font-semibold">Ручная правка</h3>
+          <h3 class="text-sm font-semibold">{{ t('dayDetail.manualEdit') }}</h3>
           <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
-            <input v-model.number="manual.entry_id" class="input" placeholder="entry_id" />
-            <input v-model="manual.field" class="input" placeholder="field (e.g. room_name)" />
-            <input v-model="manual.value" class="input" placeholder="new value" />
+            <input v-model.number="manual.entry_id" class="input" :placeholder="t('bulk.entryId')" />
+            <input v-model="manual.field" class="input" :placeholder="t('bulk.field')" />
+            <input v-model="manual.value" class="input" :placeholder="t('bulk.newValue')" />
           </div>
-          <button class="btn-primary" @click="applyManual" :disabled="!manual.entry_id || !manual.field">Применить</button>
+          <button class="btn-primary" @click="applyManual" :disabled="!manual.entry_id || !manual.field">{{ t('dayDetail.apply') }}</button>
         </div>
       </div>
       <DayReportPanel :day-id="dayId" />
@@ -35,7 +38,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
+import Spinner from '@/components/common/Spinner.vue'
 import { useRoute } from 'vue-router'
 import { api } from '@/services/api'
 import DatePicker from '@/components/common/DatePicker.vue'
@@ -45,10 +50,16 @@ import type { ScheduleEntry } from '@/types/schedule'
 import { useToast } from '@/composables/useToast'
 
 const toast = useToast()
+const { t } = useI18n()
 const route = useRoute()
 const dayId = Number(route.params.dayId)
 const lookupDate = ref('')
 const entries = ref<ScheduleEntry[]>([])
+const onlyApproved = ref(false)
+const entriesView = computed(() => {
+  if (!onlyApproved.value) return entries.value
+  return entries.value.filter(e => (e.approval_status || '').toString() === 'approved')
+})
 const loadingEntries = ref(false)
 const busy = ref(false)
 
@@ -81,4 +92,9 @@ async function applyManual() {
     await loadEntries()
   } finally { busy.value = false }
 }
+
+// Auto-load entries when lookupDate changes (debounced)
+import { useDebounce } from '@/composables/useDebounce'
+const debouncedLoad = useDebounce(() => loadEntries(), 400)
+watch(() => lookupDate.value, () => debouncedLoad())
 </script>

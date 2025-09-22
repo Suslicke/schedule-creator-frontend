@@ -1,5 +1,5 @@
 <template>
-  <div class="card p-4 hover:shadow-md transition-shadow border-l-4" :class="statusBorder">
+  <div class="card p-4 hover:shadow-md transition-shadow border-l-4 transition-transform duration-200 hover:-translate-y-0.5" :class="statusBorder">
     <div class="space-y-2">
       <div class="text-lg font-semibold leading-snug break-words">{{ entry.subject_name }}</div>
       <div class="flex flex-wrap gap-2 text-sm">

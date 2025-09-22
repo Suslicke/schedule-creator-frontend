@@ -4,14 +4,16 @@
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
         <div class="flex items-center gap-3">
           <div class="w-2 h-6 bg-brand rounded-full"></div>
-          <h1 class="text-xl font-semibold">Admin</h1>
+          <h1 class="text-xl font-semibold">{{ t('admin.title') }}</h1>
         </div>
         <nav class="flex items-center gap-3 text-sm">
-          <RouterLink class="nav-link" :to="{ name: 'admin-day-plan' }">План дня</RouterLink>
-          <RouterLink class="nav-link" :to="{ name: 'admin-upload' }">Загрузка</RouterLink>
-          <RouterLink class="nav-link" :to="{ name: 'admin-progress' }">Прогресс</RouterLink>
-          <RouterLink class="nav-link" :to="{ name: 'admin-bulk' }">Массовые</RouterLink>
-          <RouterLink class="nav-link" :to="{ name: 'admin-settings' }">Токен</RouterLink>
+          <RouterLink class="nav-link" :to="{ name: 'admin-day-plan' }">{{ t('admin.nav.dayPlan') }}</RouterLink>
+          <RouterLink class="nav-link" :to="{ name: 'admin-day-editor' }">{{ t('admin.nav.dayEditor') }}</RouterLink>
+          <RouterLink class="nav-link" :to="{ name: 'admin-upload' }">{{ t('admin.nav.upload') }}</RouterLink>
+          <RouterLink class="nav-link" :to="{ name: 'admin-progress' }">{{ t('admin.nav.progress') }}</RouterLink>
+          <RouterLink class="nav-link" :to="{ name: 'admin-analytics' }">{{ t('admin.nav.analytics') }}</RouterLink>
+          <RouterLink class="nav-link" :to="{ name: 'admin-bulk' }">{{ t('admin.nav.bulk') }}</RouterLink>
+          <RouterLink class="nav-link" :to="{ name: 'admin-settings' }">{{ t('admin.nav.settings') }}</RouterLink>
         </nav>
       </div>
     </header>
@@ -23,9 +25,10 @@
 
 <script setup lang="ts">
 import { RouterView, RouterLink } from 'vue-router'
+import { useI18n } from 'vue-i18n'
+const { t } = useI18n()
 </script>
 
 <style scoped>
 .nav-link { @apply px-2 py-1 rounded-md hover:bg-gray-100 transition-colors; }
 </style>
-

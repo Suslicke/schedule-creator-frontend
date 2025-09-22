@@ -1,5 +1,26 @@
 import { getHttp } from './http'
-import type { ScheduleEntry, DayReport, DayPlanRequest, DayPlanResponse, BulkChange, BulkDiffRow, ProgressSummary, TimeseriesPoint } from '@/types/schedule'
+import type {
+  ScheduleEntry,
+  DayReport,
+  DayPlanRequest,
+  DayPlanResponse,
+  BulkChange,
+  BulkDiffRow,
+  ProgressSummary,
+  TimeseriesPoint,
+  DayData,
+  EntryOptions,
+  RoomSwapPlan,
+  SwapRoomRequest,
+  SwapRoomResponse,
+  AnalyticsFilters,
+  TeacherSummaryItem,
+  GroupSummaryItem,
+  RoomSummaryItem,
+  HeatmapResponse,
+  DistributionItem,
+  TimeseriesAnalyticsPoint,
+} from '@/types/schedule'
 
 export const api = {
   // Public schedule queries
@@ -17,6 +38,14 @@ export const api = {
     const { data } = await getHttp().get('/dict/groups', { params: { q } })
     return normalizeOptions(data)
   },
+  async dictSubjects(q: string) {
+    const { data } = await getHttp().get('/dict/subjects', { params: { q } })
+    return normalizeOptions(data)
+  },
+  async dictRooms(q: string) {
+    const { data } = await getHttp().get('/dict/rooms', { params: { q } })
+    return normalizeOptions(data)
+  },
   // Admin: upload
   async uploadSchedule(file: File) {
     const form = new FormData()
@@ -32,6 +61,65 @@ export const api = {
   async replaceVacantAuto(dayId: number) {
     const { data } = await getHttp().post(`/admin/day/${dayId}/replace_vacant_auto`)
     return data
+  },
+  // New day flow (spec-compliant)
+  async scheduleDayPlan(payload: DayPlanRequest): Promise<DayData> {
+    const { data } = await getHttp().post('/schedule/day/plan', payload)
+    return data as DayData
+  },
+  async getDay(params: { date: string; group_name?: string }): Promise<DayData> {
+    const { data } = await getHttp().get('/schedule/day', { params })
+    return data as DayData
+  },
+  async getEntryOptions(entryId: number): Promise<EntryOptions> {
+    const { data } = await getHttp().get(`/schedule/day/entry/${entryId}/options`)
+    return data as EntryOptions
+  },
+  async getRoomSwapPlan(entryId: number, desired_room_name: string): Promise<RoomSwapPlan> {
+    const { data } = await getHttp().get(`/schedule/day/entry/${entryId}/room_swap_plan`, { params: { desired_room_name } })
+    return data as RoomSwapPlan
+  },
+  async swapRoom(entryId: number, payload: SwapRoomRequest): Promise<SwapRoomResponse> {
+    const { data } = await getHttp().post(`/schedule/day/entry/${entryId}/swap_room`, payload)
+    return data as SwapRoomResponse
+  },
+  async updateEntryManualV2(payload: { entry_id: number; teacher_name?: string; subject_name?: string; room_name?: string }) {
+    const { data } = await getHttp().post('/schedule/day/update_entry_manual', payload)
+    return data
+  },
+  async approveDayV2(dayId: number, params: { group_name?: string; record_progress?: boolean; enforce_no_blockers?: boolean }) {
+    const { data } = await getHttp().post(`/schedule/day/${dayId}/approve`, null, { params })
+    return data
+  },
+  async exportDay(params: { date: string; groups?: string[] }): Promise<Blob> {
+    const http = getHttp()
+    const { data } = await http.post('/export/day', params, { responseType: 'blob' as any })
+    return data as Blob
+  },
+  // Analytics
+  async analyticsTeacherSummary(filters: AnalyticsFilters) {
+    const { data } = await getHttp().post('/analytics/teacher/summary', filters)
+    return (data?.items ?? []) as TeacherSummaryItem[]
+  },
+  async analyticsGroupSummary(filters: AnalyticsFilters) {
+    const { data } = await getHttp().post('/analytics/group/summary', filters)
+    return (data?.items ?? []) as GroupSummaryItem[]
+  },
+  async analyticsRoomSummary(filters: AnalyticsFilters) {
+    const { data } = await getHttp().post('/analytics/room/summary', filters)
+    return (data?.items ?? []) as RoomSummaryItem[]
+  },
+  async analyticsHeatmap(dimension: 'teacher'|'group'|'room', name: string, filters: AnalyticsFilters) {
+    const { data } = await getHttp().post(`/analytics/heatmap`, filters, { params: { dimension, name } })
+    return data as HeatmapResponse
+  },
+  async analyticsDistribution(dimension: 'teacher'|'group'|'subject'|'room', filters: AnalyticsFilters) {
+    const { data } = await getHttp().post('/analytics/distribution', filters, { params: { dimension } })
+    return (data?.items ?? []) as DistributionItem[]
+  },
+  async analyticsTimeseries(filters: AnalyticsFilters) {
+    const { data } = await getHttp().post('/analytics/timeseries', filters)
+    return (data?.points ?? []) as TimeseriesAnalyticsPoint[]
   },
   async dayReport(dayId: number): Promise<DayReport> {
     const { data } = await getHttp().get(`/schedule/day/${dayId}/report`)

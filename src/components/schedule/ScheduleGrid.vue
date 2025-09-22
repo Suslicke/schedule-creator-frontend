@@ -4,7 +4,9 @@
       <template v-for="(group, idx) in groups" :key="idx">
         <div class="space-y-2">
           <div class="text-lg font-semibold text-gray-800">{{ group.time }}</div>
-          <EntryCard v-for="(e, i) in group.items" :key="entryKey(e, i)" :entry="e" />
+          <TransitionGroup name="fade-move" tag="div" class="space-y-2">
+            <EntryCard v-for="(e, i) in group.items" :key="entryKey(e, i)" :entry="e" />
+          </TransitionGroup>
         </div>
       </template>
     </div>
@@ -36,3 +38,8 @@ function entryKey(e: ScheduleEntry, i: number) {
   return e.entry_id ?? `${e.date}-${e.start_time}-${e.end_time}-${e.group_name}-${e.subject_name}-${i}`
 }
 </script>
+
+<style scoped>
+.fade-move-enter-active, .fade-move-leave-active, .fade-move-move { transition: all 0.25s ease; }
+.fade-move-enter-from, .fade-move-leave-to { opacity: 0; transform: translateY(4px); }
+</style>
