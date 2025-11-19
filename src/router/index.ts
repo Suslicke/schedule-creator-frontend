@@ -11,7 +11,12 @@ import DayDetail from '@/views/admin/DayDetail.vue'
 import DayEditor from '@/views/admin/DayEditor.vue'
 import Progress from '@/views/admin/Progress.vue'
 import Analytics from '@/views/admin/Analytics.vue'
+import Generation from '@/views/admin/Generation.vue'
+import Replacements from '@/views/admin/Replacements.vue'
+import Practice from '@/views/admin/Practice.vue'
+import Export from '@/views/admin/Export.vue'
 import BulkEdits from '@/views/admin/BulkEdits.vue'
+import DayScheduleCreator from '@/views/admin/DayScheduleCreator.vue'
 import { useAuthStore } from '@/stores/auth'
 
 const routes: RouteRecordRaw[] = [
@@ -23,14 +28,19 @@ const routes: RouteRecordRaw[] = [
     path: '/admin',
     component: AdminShell,
     children: [
-      { path: '', redirect: { name: 'admin-day-plan' } },
+      { path: '', redirect: { name: 'admin-day-editor' } },
       { path: 'settings', name: 'admin-settings', component: AdminSettings },
       { path: 'upload', name: 'admin-upload', component: Upload, meta: { requiresAdmin: true } },
       { path: 'day/plan', name: 'admin-day-plan', component: DayPlan, meta: { requiresAdmin: true } },
+      { path: 'day/creator', name: 'admin-day-creator', component: DayScheduleCreator, meta: { requiresAdmin: true } },
       { path: 'day/editor', name: 'admin-day-editor', component: DayEditor, meta: { requiresAdmin: true } },
       { path: 'day/:dayId', name: 'admin-day-detail', component: DayDetail, meta: { requiresAdmin: true } },
       { path: 'progress', name: 'admin-progress', component: Progress, meta: { requiresAdmin: true } },
       { path: 'analytics', name: 'admin-analytics', component: Analytics, meta: { requiresAdmin: true } },
+      { path: 'generation', name: 'admin-generation', component: Generation, meta: { requiresAdmin: true } },
+      { path: 'replacements', name: 'admin-replacements', component: Replacements, meta: { requiresAdmin: true } },
+      { path: 'practice', name: 'admin-practice', component: Practice, meta: { requiresAdmin: true } },
+      { path: 'export', name: 'admin-export', component: Export, meta: { requiresAdmin: true } },
       { path: 'bulk', name: 'admin-bulk', component: BulkEdits, meta: { requiresAdmin: true } }
     ]
   },

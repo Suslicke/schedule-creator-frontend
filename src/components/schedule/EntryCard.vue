@@ -33,26 +33,25 @@ import Badge from '@/components/common/Badge.vue'
 import type { ScheduleEntry } from '@/types/schedule'
 
 const props = defineProps<{ entry: ScheduleEntry }>()
-function statusCategory(raw: string | null | undefined) {
+function statusKey(raw: string | null | undefined) {
   const s = (raw || 'planned').toString()
-  if (s.startsWith('replaced')) return 'replaced'
-  if (s === 'approved') return 'approved'
-  if (s === 'pending' || s === 'planned' || s === 'draft') return 'planned'
-  return 'planned'
+  return s
 }
 const statusColor = computed(() => {
-  switch (statusCategory(props.entry.approval_status)) {
-    case 'approved': return 'green'
-    case 'replaced': return 'purple'
-    default: return 'gray'
-  }
+  const s = statusKey(props.entry.approval_status)
+  if (s === 'approved') return 'green'
+  if (s === 'replaced_manual') return 'blue'
+  if (s === 'replaced_auto') return 'teal'
+  if (s.startsWith('replaced')) return 'blue'
+  return 'gray'
 })
 const statusBorder = computed(() => {
-  switch (statusCategory(props.entry.approval_status)) {
-    case 'approved': return 'border-green-500'
-    case 'replaced': return 'border-purple-500'
-    default: return 'border-gray-300'
-  }
+  const s = statusKey(props.entry.approval_status)
+  if (s === 'approved') return 'border-green-500'
+  if (s === 'replaced_manual') return 'border-blue-500'
+  if (s === 'replaced_auto') return 'border-teal-500'
+  if (s.startsWith('replaced')) return 'border-blue-500'
+  return 'border-gray-300'
 })
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -62,10 +61,6 @@ const statusLabel = computed(() => {
   const key = `status.${raw}`
   const tr = t(key)
   if (tr !== key) return tr
-  const cat = statusCategory(raw)
-  const key2 = `status.${cat}`
-  const tr2 = t(key2)
-  if (tr2 !== key2) return tr2
   return raw.replace(/_/g, ' ')
 })
 const originLabel = computed(() => t(`origin.${props.entry.origin === 'day_plan' ? 'day_plan' : 'weekly'}`))

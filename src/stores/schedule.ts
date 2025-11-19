@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import type { ScheduleEntry } from '@/types/schedule'
 import { api } from '@/services/api'
+import { weekRange } from '@/utils/format'
 
 export const useScheduleStore = defineStore('schedule', {
   state: () => ({

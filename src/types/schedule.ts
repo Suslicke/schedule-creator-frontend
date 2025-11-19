@@ -30,7 +30,17 @@ export type DayPlanRequest = {
 
 export type DayPlanResponse = { id: number; entries: (ScheduleEntry & { status?: string })[] }
 
-export type DayReport = { blockers: string[]; warnings: string[] }
+export type DayReport = { blockers: string[]; warnings: string[]; issues?: DayIssue[] }
+
+export type DayIssue = {
+  code?: string
+  severity: 'blocker' | 'warning' | string
+  message: string
+  entry_ids?: number[]
+  group_name?: string
+  teacher_name?: string
+  room_name?: string
+}
 
 export type BulkChange = { entry_id: number; field: string; new_value: string }
 export type BulkDiffRow = { entry_id: number; field: string; old_value: string; new_value: string }
@@ -100,8 +110,22 @@ export type EntryOptions = {
   subject_name: string
   start_time: string
   end_time: string
-  teachers: { teacher_name: string; source?: string }[]
-  rooms: { room_name: string; capacity?: number }[]
+  teachers: {
+    teacher_name: string
+    source?: 'group_subject_mapping' | 'group_mapping' | 'free' | 'busy' | string
+    busy?: boolean
+    conflicts_count?: number
+    busy_groups?: string[]
+    conflicts?: { entry_id: number; group_name: string; subject_name: string; room_name: string }[]
+  }[]
+  rooms: {
+    room_name: string
+    capacity?: number
+    busy?: boolean
+    conflicts_count?: number
+    used?: number
+    occupied_by?: { entry_id: number; group_name: string; subject_name: string; teacher_name: string }[]
+  }[]
 }
 
 // Room swap planning
@@ -123,6 +147,29 @@ export type RoomSwapPlan = {
 export type SwapRoomChoice = { entry_id: number; room_name: string }
 export type SwapRoomRequest = { desired_room_name: string; choices?: SwapRoomChoice[]; dry_run?: boolean }
 export type SwapRoomResponse = { changed: { entry_id: number; old_room: string; new_room: string }[]; report?: any }
+
+// Teacher swap planning
+export type TeacherSwapPlan = {
+  entry_id: number
+  date?: string
+  start_time?: string
+  end_time?: string
+  desired_teacher_name: string
+  desired_subject_name?: string
+  is_free: boolean
+  can_auto_resolve?: boolean
+  conflicts?: {
+    entry_id: number
+    group_name: string
+    subject_name: string
+    teacher_name: string
+    alternatives: string[]
+  }[]
+}
+
+export type SwapTeacherChoice = { entry_id: number; teacher_name: string }
+export type SwapTeacherRequest = { desired_teacher_name: string; choices?: SwapTeacherChoice[]; dry_run?: boolean }
+export type SwapTeacherResponse = { changed: { entry_id: number; old_teacher: string | null; new_teacher: string }[]; report?: any; dry_run?: boolean }
 
 // Analytics types
 export type AnalyticsFilters = {

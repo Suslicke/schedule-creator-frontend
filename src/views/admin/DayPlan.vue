@@ -101,19 +101,13 @@ watch(opts, () => debouncedBuild(), { deep: true })
 // Initial auto-build
 buildPlan()
 
-function statusCategory(raw: string | null | undefined) {
-  const s = (raw || 'planned').toString()
-  if (s.startsWith('replaced')) return 'replaced'
-  if (s === 'approved') return 'approved'
-  if (s === 'pending' || s === 'planned' || s === 'draft') return 'planned'
-  return 'planned'
-}
 function statusClass(raw: string | null | undefined) {
-  switch (statusCategory(raw)) {
-    case 'approved': return 'bg-green-100 text-green-700'
-    case 'replaced': return 'bg-purple-100 text-purple-700'
-    default: return 'bg-gray-100 text-gray-700'
-  }
+  const s = (raw || '').toString()
+  if (s === 'approved') return 'bg-green-100 text-green-700'
+  if (s === 'replaced_manual') return 'bg-blue-100 text-blue-700'
+  if (s === 'replaced_auto') return 'bg-teal-100 text-teal-700'
+  if (s.startsWith('replaced')) return 'bg-blue-100 text-blue-700'
+  return 'bg-gray-100 text-gray-700'
 }
 function statusLabel(raw: string | null | undefined) {
   const key = `status.${(raw || 'planned').toString()}`

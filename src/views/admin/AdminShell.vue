@@ -7,12 +7,20 @@
           <h1 class="text-xl font-semibold">{{ t('admin.title') }}</h1>
         </div>
         <nav class="flex items-center gap-3 text-sm">
-          <RouterLink class="nav-link" :to="{ name: 'admin-day-plan' }">{{ t('admin.nav.dayPlan') }}</RouterLink>
+          <!-- Hidden: day plan -->
+          <!-- <RouterLink class="nav-link" :to="{ name: 'admin-day-plan' }">{{ t('admin.nav.dayPlan') }}</RouterLink> -->
+          <RouterLink class="nav-link" :to="{ name: 'admin-day-creator' }">Day Creator</RouterLink>
           <RouterLink class="nav-link" :to="{ name: 'admin-day-editor' }">{{ t('admin.nav.dayEditor') }}</RouterLink>
           <RouterLink class="nav-link" :to="{ name: 'admin-upload' }">{{ t('admin.nav.upload') }}</RouterLink>
-          <RouterLink class="nav-link" :to="{ name: 'admin-progress' }">{{ t('admin.nav.progress') }}</RouterLink>
+          <!-- Hidden: progress -->
+          <!-- <RouterLink class="nav-link" :to="{ name: 'admin-progress' }">{{ t('admin.nav.progress') }}</RouterLink> -->
           <RouterLink class="nav-link" :to="{ name: 'admin-analytics' }">{{ t('admin.nav.analytics') }}</RouterLink>
-          <RouterLink class="nav-link" :to="{ name: 'admin-bulk' }">{{ t('admin.nav.bulk') }}</RouterLink>
+          <RouterLink class="nav-link" :to="{ name: 'admin-generation' }">Generation</RouterLink>
+          <RouterLink class="nav-link" :to="{ name: 'admin-replacements' }">Replacements</RouterLink>
+          <RouterLink class="nav-link" :to="{ name: 'admin-practice' }">Practice</RouterLink>
+          <RouterLink class="nav-link" :to="{ name: 'admin-export' }">Export</RouterLink>
+          <!-- Hidden: bulk -->
+          <!-- <RouterLink class="nav-link" :to="{ name: 'admin-bulk' }">{{ t('admin.nav.bulk') }}</RouterLink> -->
           <RouterLink class="nav-link" :to="{ name: 'admin-settings' }">{{ t('admin.nav.settings') }}</RouterLink>
         </nav>
       </div>

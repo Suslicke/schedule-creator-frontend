@@ -11,6 +11,22 @@ export function getHttp(): AxiosInstance {
   return http
 }
 
+// Cache invalidation helpers for GET cache (query-key like)
+export function invalidateCacheByPrefix(prefix: string) {
+  // Remove any cached GET whose full URL contains the prefix
+  const keys = Array.from(lastGetCache.keys())
+  for (const k of keys) {
+    if (k.includes(prefix)) lastGetCache.delete(k)
+  }
+}
+
+export function invalidateCacheWhere(predicate: (key: string) => boolean) {
+  const keys = Array.from(lastGetCache.keys())
+  for (const k of keys) {
+    if (predicate(k)) lastGetCache.delete(k)
+  }
+}
+
 export function setupHttp(pinia: Pinia, router: Router, hooks: { onError: (msg: string) => void, onAuthRequired: () => void }) {
   const baseURL = import.meta.env.VITE_API_BASE_URL || '/api'
   const debug = (import.meta as any).env?.VITE_HTTP_DEBUG === 'true'
@@ -42,8 +58,8 @@ export function setupHttp(pinia: Pinia, router: Router, hooks: { onError: (msg: 
         ;(config as any)._cacheKey = finalUrl
       } catch { /* ignore */ }
     }
-    const needsToken = (config.method?.toLowerCase() === 'post') || path.startsWith('/admin')
-    if (needsToken && auth.adminToken) {
+    // Always attach admin token if present (backend may require it for non-/admin and for GET)
+    if (auth.adminToken) {
       config.headers = config.headers || {}
       ;(config.headers as any)['X-Admin-Token'] = auth.adminToken
     }
@@ -69,8 +85,13 @@ export function setupHttp(pinia: Pinia, router: Router, hooks: { onError: (msg: 
     },
     (error: AxiosError<any>) => {
       const status = error.response?.status
+      const method = (error.config?.method || 'get').toLowerCase()
       const detail = (error.response?.data as any)?.detail || error.message
       if (debug) console.error('[HTTP ERROR]', status, detail)
+      // Silent 404s for GET requests (used for existence checks like day lookup)
+      if (status === 404 && method === 'get') {
+        return Promise.reject(error)
+      }
       // If 304 still came as error, try to serve cached data
       if (status === 304) {
         const cfg: any = error.config || {}
